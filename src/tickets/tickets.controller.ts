@@ -1,0 +1,26 @@
+import { Body, Controller, Post, Request, UseGuards } from '@nestjs/common';
+import { TicketsService } from './tickets.service';
+import { CreateTicketDto } from './createTicket.dto';
+import { JwtAuthGuard } from 'src/auth/guards/jwt.auth.guard';
+
+@Controller('tickets')
+export class TicketsController {
+
+    //constructor para trazer o service
+    constructor(
+        private ticketService : TicketsService
+    ) {}
+
+    //definicao das rotas
+
+//rota create
+@UseGuards(JwtAuthGuard)
+@Post('create')
+create(@Body() createTicketDto :  CreateTicketDto, @Request() req,){
+    return this.ticketService.create(
+        createTicketDto,
+        req.user.sub
+    )
+}
+
+}
