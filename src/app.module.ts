@@ -7,9 +7,10 @@ import { TicketsModule } from './tickets/tickets.module';
 import { CommentModule } from './comment/comment.module';
 import { CommentController } from './comment/comment.controller';
 import { CommentService } from './comment/comment.service';
+import { LogModule } from './log/log.module';
 
 @Module({
-  imports: [AuthModule, PrismaModule, TicketsModule, CommentModule],
+  imports: [AuthModule, PrismaModule, TicketsModule, CommentModule, LogModule],
   controllers: [AppController, CommentController],
   providers: [AppService, CommentService],
 })

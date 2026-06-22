@@ -3,13 +3,15 @@ import { error } from 'console';
 import prismaConfig from 'prisma.config';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { CreateCommentDto } from './comment.dto';
+import { LogService } from 'src/log/log.service';
 
 
 @Injectable()
 export class CommentService {
 
     constructor(
-        private prisma : PrismaService
+        private prisma : PrismaService,
+        private logService : LogService
     ){}
 
     //criacao dos metodos comment
@@ -46,6 +48,13 @@ async create(
     }
 
     console.log('comentario criado com sucesso')
+
+    // Comentário criado
+    await this.logService.create(
+    'Comentário criado',
+    userId,
+    ticketId,
+    );
 
     return {
         message : 'comentario criado com sucesso',
