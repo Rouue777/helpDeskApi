@@ -1,14 +1,15 @@
-import { Body, Controller, Post, Request, UseGuards } from '@nestjs/common';
+import { Body, Controller, Param, Patch, Post, Request, UseGuards } from '@nestjs/common';
 import { TicketsService } from './tickets.service';
 import { CreateTicketDto } from './createTicket.dto';
 import { JwtAuthGuard } from 'src/auth/guards/jwt.auth.guard';
+import { UpdateTicketStatusDto } from './updateTicketStatus.dto';
 
 @Controller('tickets')
 export class TicketsController {
 
     //constructor para trazer o service
     constructor(
-        private ticketService : TicketsService
+        private ticketService : TicketsService,
     ) {}
 
     //definicao das rotas
@@ -22,5 +23,24 @@ create(@Body() createTicketDto :  CreateTicketDto, @Request() req,){
         req.user.sub
     )
 }
+
+//rota para atualizar status
+@UseGuards(JwtAuthGuard)
+@Patch(":ticketId/status")
+updateStatus(@Param('ticketId') ticketId : string,
+@Request() req,
+@Body() updateStatusDto : UpdateTicketStatusDto,
+){
+    return this.ticketService.updateStatus(
+        ticketId,
+        req.user,
+        updateStatusDto
+    )
+}
+
+
+
+
+
 
 }
