@@ -78,6 +78,7 @@ async  login (loginDto : LoginDto) {
   //Gerarando o token jwt
   //criando payload
   const payload = {
+  name : UserExists.name,
   sub : UserExists.id,
   email : UserExists.email,
   role : UserExists.role,

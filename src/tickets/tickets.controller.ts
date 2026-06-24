@@ -38,6 +38,18 @@ updateStatus(@Param('ticketId') ticketId : string,
     )
 }
 
+//rota para assumir ticket 
+@UseGuards(JwtAuthGuard)
+@Patch(":ticketId/assign")
+assignTicket(
+    @Param('ticketId') ticketId : string,
+    @Request() req ,
+){
+    return  this.ticketService.assignTicket(
+        ticketId,
+        req.user
+    )
+}
 
 
 

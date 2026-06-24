@@ -1,4 +1,4 @@
-import { ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
+import { ConflictException, ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { CreateTicketDto } from './createTicket.dto';
 import { UpdateTicketDto } from './updateTicket.dto';
@@ -84,9 +84,63 @@ async updateStatus (ticketId : string, user : any, updateStatus : UpdateTicketSt
     ticket: statusUpdated,
   };
 
-  // 3b23a9f0-7bca-42d0-8ea9-bbcf270a4804 id do ticket para teste
 
 
+
+
+}
+
+
+//assumir ticket
+
+async assignTicket(ticketId : string, user : any){
+
+    const TicketExists = await this.prisma.ticket.findUnique({
+        where : {
+            id : ticketId
+        }
+    })
+
+
+    if(!TicketExists){
+        throw new NotFoundException("ticket não encontrado")
+    }
+
+    //permissao de role
+    if (user.role === 'USER') {
+    throw new ForbiddenException(
+        'Você não tem permissão para assumir tickets',
+    );
+    }
+
+
+    if(TicketExists.assignedToId != null){
+        throw new ConflictException("esse ticket já está atribuido")
+    }
+
+    //assumindo ticket e mudando status
+    const assignedTicket = await this.prisma.ticket.update({
+        where : {
+            id : ticketId
+        },
+        data : {
+            assignedToId : user.sub,
+            status : "IN_PROGRESS"
+        }
+    })
+
+    //criando log
+    await this.logService.create(
+        `ticket assumido por ${user.name}`,
+        user.sub,
+        ticketId
+    )
+
+
+    return {
+    message: `Ticket assumido com sucesso por ${user.name}`,
+    ticket: assignedTicket,
+    };
 
 
 }
