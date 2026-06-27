@@ -3,6 +3,7 @@ import { TicketsService } from './tickets.service';
 import { CreateTicketDto } from './createTicket.dto';
 import { JwtAuthGuard } from 'src/auth/guards/jwt.auth.guard';
 import { UpdateTicketStatusDto } from './updateTicketStatus.dto';
+import { AssignTicketDto } from './assignmentTicket.dto';
 
 @Controller('tickets')
 export class TicketsController {
@@ -49,6 +50,21 @@ assignTicket(
         ticketId,
         req.user
     )
+}
+
+////rota para atribuir ticket 
+@UseGuards(JwtAuthGuard)
+@Patch(':ticketId/assign-user')
+assignmentTicket(
+  @Param('ticketId') ticketId: string,
+  @Request() req,
+  @Body() assignTicketDto: AssignTicketDto,
+) {
+  return this.ticketService.assignmentTicket(
+    ticketId,
+    req.user,
+    assignTicketDto,
+  );
 }
 
 

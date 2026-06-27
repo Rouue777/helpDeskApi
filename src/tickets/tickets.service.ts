@@ -4,148 +4,215 @@ import { CreateTicketDto } from './createTicket.dto';
 import { UpdateTicketDto } from './updateTicket.dto';
 import { LogService } from 'src/log/log.service';
 import { UpdateTicketStatusDto } from './updateTicketStatus.dto';
+import { AssignTicketDto } from './assignmentTicket.dto';
 
 @Injectable()
 export class TicketsService {
 
     //constructor para instanciar coisas necessarias 
-    constructor(private  prisma : PrismaService,
-     private logService : LogService
-     ) {}
+    constructor(private prisma: PrismaService,
+        private logService: LogService
+    ) { }
 
     //metodos para ticket 
-    
-  //create ticket
-async create(createTicketDto, userId : string){
-     const ticket = await this.prisma.ticket.create({
-        data :{ ...createTicketDto,
-        createdById : userId }
 
-    })
+    //create ticket
+    async create(createTicketDto, userId: string) {
+        const ticket = await this.prisma.ticket.create({
+            data: {
+                ...createTicketDto,
+                createdById: userId
+            }
 
-            // Ticket criado
-    await this.logService.create(
-    'Ticket criado',
-    userId,
-    ticket.id,
-    );
+        })
 
-    return {
-        message : 'ticket criado com sucesso',
-        ticket,
-    }
+        // Ticket criado
+        await this.logService.create(
+            'Ticket criado',
+            userId,
+            ticket.id,
+        );
 
-
-
-
-
-}
-
-//metodo updateStatus
-async updateStatus (ticketId : string, user : any, updateStatus : UpdateTicketStatusDto){
-
-    const TicketExists = await this.prisma.ticket.findUnique({
-        where : {
-            id: ticketId
+        return {
+            message: 'ticket criado com sucesso',
+            ticket,
         }
-    })
 
-    if(!TicketExists) {
-        throw new NotFoundException('ticket não encontrado')
+
+
+
+
     }
 
-    //verificacao da role 
+    //metodo updateStatus
+    async updateStatus(ticketId: string, user: any, updateStatus: UpdateTicketStatusDto) {
 
-    if(user.role === "USER"){
-        //executa erro
-        throw new ForbiddenException('Você não tem acesso a essa rota')
-    }
+        const TicketExists = await this.prisma.ticket.findUnique({
+            where: {
+                id: ticketId
+            }
+        })
 
-    //atualizando status 
-    const statusUpdated = await this.prisma.ticket.update({
-        where : {
-            id : ticketId
-        },
-        data : {
-            status : updateStatus.status
+        if (!TicketExists) {
+            throw new NotFoundException('ticket não encontrado')
         }
-    })
 
+        //verificacao da role 
 
-    //gerar log
-    await this.logService.create(
-        `Status atualizado para ${updateStatus.status}`,
-        user.sub,
-        ticketId
-    )
-
-    return {
-    message: 'Status atualizado com sucesso',
-    ticket: statusUpdated,
-  };
-
-
-
-
-
-}
-
-
-//assumir ticket
-
-async assignTicket(ticketId : string, user : any){
-
-    const TicketExists = await this.prisma.ticket.findUnique({
-        where : {
-            id : ticketId
+        if (user.role === "USER") {
+            //executa erro
+            throw new ForbiddenException('Você não tem acesso a essa rota')
         }
-    })
+
+        //atualizando status 
+        const statusUpdated = await this.prisma.ticket.update({
+            where: {
+                id: ticketId
+            },
+            data: {
+                status: updateStatus.status
+            }
+        })
 
 
-    if(!TicketExists){
-        throw new NotFoundException("ticket não encontrado")
+        //gerar log
+        await this.logService.create(
+            `Status atualizado para ${updateStatus.status}`,
+            user.sub,
+            ticketId
+        )
+
+        return {
+            message: 'Status atualizado com sucesso',
+            ticket: statusUpdated,
+        };
+
+
+
+
+
     }
 
-    //permissao de role
-    if (user.role === 'USER') {
-    throw new ForbiddenException(
-        'Você não tem permissão para assumir tickets',
-    );
-    }
+
+    //assumir ticket
+
+    async assignTicket(ticketId: string, user: any) {
+
+        const TicketExists = await this.prisma.ticket.findUnique({
+            where: {
+                id: ticketId
+            }
+        })
 
 
-    if(TicketExists.assignedToId != null){
-        throw new ConflictException("esse ticket já está atribuido")
-    }
-
-    //assumindo ticket e mudando status
-    const assignedTicket = await this.prisma.ticket.update({
-        where : {
-            id : ticketId
-        },
-        data : {
-            assignedToId : user.sub,
-            status : "IN_PROGRESS"
+        if (!TicketExists) {
+            throw new NotFoundException("ticket não encontrado")
         }
-    })
 
-    //criando log
-    await this.logService.create(
-        `ticket assumido por ${user.name}`,
-        user.sub,
-        ticketId
-    )
-
-
-    return {
-    message: `Ticket assumido com sucesso por ${user.name}`,
-    ticket: assignedTicket,
-    };
+        //permissao de role
+        if (user.role === 'USER') {
+            throw new ForbiddenException(
+                'Você não tem permissão para assumir tickets',
+            );
+        }
 
 
-}
+        if (TicketExists.assignedToId != null) {
+            throw new ConflictException("esse ticket já está atribuido")
+        }
+
+        //assumindo ticket e mudando status
+        const assignedTicket = await this.prisma.ticket.update({
+            where: {
+                id: ticketId
+            },
+            data: {
+                assignedToId: user.sub,
+                status: "IN_PROGRESS"
+            }
+        })
+
+        //criando log
+        await this.logService.create(
+            `ticket assumido por ${user.name}`,
+            user.sub,
+            ticketId
+        )
 
 
+        return {
+            message: `Ticket assumido com sucesso por ${user.name}`,
+            ticket: assignedTicket,
+        };
+
+
+    }
+
+    /////admin atribui ticket
+
+    async assignmentTicket(
+        ticketId: string,
+        user: any,
+        assignTicketDto: AssignTicketDto,
+    ) {
+        // Apenas ADMIN pode atribuir tickets
+        if (user.role !== 'ADMIN') {
+            throw new ForbiddenException(
+                'Sua role não permite esse tipo de interação',
+            );
+        }
+
+        // Verifica se o ticket existe
+        const ticketExists = await this.prisma.ticket.findUnique({
+            where: {
+                id: ticketId,
+            },
+        });
+
+        if (!ticketExists) {
+            throw new NotFoundException('Ticket não encontrado');
+        }
+
+        // Verifica se o usuário existe
+        const userExists = await this.prisma.user.findUnique({
+            where: {
+                email: assignTicketDto.email,
+            },
+        });
+
+        if (!userExists) {
+            throw new NotFoundException('Usuário não encontrado');
+        }
+
+        if (userExists.role === 'USER') {
+            throw new ForbiddenException(
+                'Este usuário não pode receber tickets',
+            );
+        }
+
+        // Atualiza o ticket
+        const assignedTicket = await this.prisma.ticket.update({
+            where: {
+                id: ticketId,
+            },
+            data: {
+                assignedToId: userExists.id,
+                status: 'IN_PROGRESS',
+            },
+        });
+
+        // Cria o log
+        await this.logService.create(
+            `Ticket atribuído para ${userExists.name}`,
+            user.sub,
+            ticketId,
+        );
+
+        return {
+            message: 'Ticket atribuído com sucesso',
+            ticket: assignedTicket,
+        };
+    }
 
 
 
