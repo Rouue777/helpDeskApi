@@ -1,9 +1,10 @@
-import { Body, Controller, Get, Param, Patch, Post, Request, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Param, Patch, Post, Query, Request, UseGuards } from '@nestjs/common';
 import { TicketsService } from './tickets.service';
 import { CreateTicketDto } from './createTicket.dto';
 import { JwtAuthGuard } from 'src/auth/guards/jwt.auth.guard';
 import { UpdateTicketStatusDto } from './updateTicketStatus.dto';
 import { AssignTicketDto } from './assignmentTicket.dto';
+import { Priority } from '@prisma/client';
 
 @Controller('tickets')
 export class TicketsController {
@@ -32,6 +33,17 @@ getAll(@Request() req){
 
  return this.ticketService.getAllTickets(req.user)
 
+}
+
+//rota para exibir ticket por priority
+@UseGuards(JwtAuthGuard)
+@Get('/filter')
+getTickets(
+  @Request() req,
+  @Query('priority') priority: Priority,
+) {
+    console.log(priority)
+  return this.ticketService.getTicketByPriority(req.user, priority);
 }
 
 

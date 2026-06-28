@@ -5,6 +5,8 @@ import { UpdateTicketDto } from './updateTicket.dto';
 import { LogService } from 'src/log/log.service';
 import { UpdateTicketStatusDto } from './updateTicketStatus.dto';
 import { AssignTicketDto } from './assignmentTicket.dto';
+import { EnumPriorityFilter } from 'generated/prisma/commonInputTypes';
+import { Priority } from '@prisma/client';
 
 @Injectable()
 export class TicketsService {
@@ -117,6 +119,30 @@ export class TicketsService {
 
 
 
+    }
+
+
+    ///exibir ticket pela prioridade (só para SUPPORT E ADMIN)
+    async getTicketByPriority (user : any , priority : Priority){
+       
+       
+       if(user.role === "USER"){
+        throw new ForbiddenException('você não possui essa permissão para acessar tickets dessa forma')
+       }
+        const tickets =  await this.prisma.ticket.findMany({
+            where : {
+                priority : priority
+            }
+        })
+
+        if(tickets.length === 0){
+            throw new NotFoundException(`nenhum ticket com prioridade : ${priority} foi encontrado`)
+        }
+
+        return {
+            message : "retorno correto",
+            tickets
+        }
     }
 
     //metodo updateStatus
