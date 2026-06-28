@@ -1,4 +1,4 @@
-import { Body, Controller, Param, Patch, Post, Request, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Param, Patch, Post, Request, UseGuards } from '@nestjs/common';
 import { TicketsService } from './tickets.service';
 import { CreateTicketDto } from './createTicket.dto';
 import { JwtAuthGuard } from 'src/auth/guards/jwt.auth.guard';
@@ -23,6 +23,15 @@ create(@Body() createTicketDto :  CreateTicketDto, @Request() req,){
         createTicketDto,
         req.user.sub
     )
+}
+
+//rota para exibir todos tickets do usuario
+@UseGuards(JwtAuthGuard)
+@Get()
+getAll(@Request() req){
+
+ return this.ticketService.getAllTickets(req.user)
+
 }
 
 //rota para atualizar status

@@ -44,6 +44,34 @@ export class TicketsService {
 
     }
 
+
+    //exibir todos tickets
+    async getAllTickets(user : any){
+
+        const tickets = await this.prisma.ticket.findMany({
+            where : {
+                createdById : user.sub
+            },
+              orderBy: {
+                createdAt: 'desc',
+            },
+        })
+
+
+        if (tickets.length === 0) {
+            throw new NotFoundException(
+                "Usuário não possui tickets",
+            );
+        }
+
+        return {
+            message : "retorno correto",
+            ticketList : tickets
+        }
+
+
+    }
+
     //metodo updateStatus
     async updateStatus(ticketId: string, user: any, updateStatus: UpdateTicketStatusDto) {
 
