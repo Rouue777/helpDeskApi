@@ -46,13 +46,13 @@ export class TicketsService {
 
 
     //exibir todos tickets
-    async getAllTickets(user : any){
+    async getAllTickets(user: any) {
 
         const tickets = await this.prisma.ticket.findMany({
-            where : {
-                createdById : user.sub
+            where: {
+                createdById: user.sub
             },
-              orderBy: {
+            orderBy: {
                 createdAt: 'desc',
             },
         })
@@ -65,9 +65,56 @@ export class TicketsService {
         }
 
         return {
-            message : "retorno correto",
-            ticketList : tickets
+            message: "retorno correto",
+            ticketList: tickets
         }
+
+
+    }
+
+
+    //exibir ticket pelo id
+    async getTicketById(user: any, ticketId: string) {
+
+
+        //logica para SUPPORT ADMIN
+        if (user.role === "SUPPORT" || user.role === "ADMIN") {
+            const ticket = await this.prisma.ticket.findFirst({
+                where: {
+                    id: ticketId
+                }
+            })
+            if (!ticket) {
+                throw new NotFoundException('Ticket não encontrado');
+            }
+
+            return {
+                message: 'Ticket encontrado',
+                ticket,
+            };
+
+        }
+
+        //logica para user 
+        if (user.role === "USER") {
+            const ticket = await this.prisma.ticket.findFirst({
+                where: {
+                    id: ticketId,
+                    createdById: user.sub
+                }
+            })
+
+            if (!ticket) {
+                throw new NotFoundException('Ticket não encontrado');
+            }
+
+            return {
+                message: 'Ticket encontrado',
+                ticket,
+            };
+
+        }
+
 
 
     }

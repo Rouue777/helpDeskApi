@@ -34,6 +34,18 @@ getAll(@Request() req){
 
 }
 
+
+//rota para exibir tickerporId
+@UseGuards(JwtAuthGuard)
+@Get(":ticketId")
+getTicketById(
+    @Param('ticketId') ticketId : string,
+    @Request() req  
+){
+
+    return this.ticketService.getTicketById(req.user, ticketId)
+}
+
 //rota para atualizar status
 @UseGuards(JwtAuthGuard)
 @Patch(":ticketId/status")
