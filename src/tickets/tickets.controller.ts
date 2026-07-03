@@ -5,6 +5,11 @@ import { JwtAuthGuard } from 'src/auth/guards/jwt.auth.guard';
 import { UpdateTicketStatusDto } from './updateTicketStatus.dto';
 import { AssignTicketDto } from './assignmentTicket.dto';
 import { Priority } from '@prisma/client';
+import {
+  ApiBearerAuth,
+  ApiOperation,
+  ApiTags,
+} from '@nestjs/swagger';
 
 @Controller('tickets')
 export class TicketsController {
@@ -17,6 +22,10 @@ export class TicketsController {
     //definicao das rotas
 
 //rota create
+@ApiBearerAuth()
+@ApiOperation({
+  summary: 'Criar ticket',
+})
 @UseGuards(JwtAuthGuard)
 @Post('create')
 create(@Body() createTicketDto :  CreateTicketDto, @Request() req,){
@@ -27,6 +36,7 @@ create(@Body() createTicketDto :  CreateTicketDto, @Request() req,){
 }
 
 //rota para exibir todos tickets do usuario
+@ApiBearerAuth()
 @UseGuards(JwtAuthGuard)
 @Get()
 getAll(@Request() req){
@@ -36,6 +46,7 @@ getAll(@Request() req){
 }
 
 //rota para exibir ticket por priority
+@ApiBearerAuth()
 @UseGuards(JwtAuthGuard)
 @Get('/filter')
 getTickets(
@@ -48,6 +59,7 @@ getTickets(
 
 
 //rota para exibir tickerporId
+@ApiBearerAuth()
 @UseGuards(JwtAuthGuard)
 @Get(":ticketId")
 getTicketById(
@@ -59,6 +71,7 @@ getTicketById(
 }
 
 //rota para atualizar status
+@ApiBearerAuth()
 @UseGuards(JwtAuthGuard)
 @Patch(":ticketId/status")
 updateStatus(@Param('ticketId') ticketId : string,
@@ -73,6 +86,10 @@ updateStatus(@Param('ticketId') ticketId : string,
 }
 
 //rota para assumir ticket 
+@ApiBearerAuth()
+@ApiOperation({
+  summary: 'Assumir ticket',
+})
 @UseGuards(JwtAuthGuard)
 @Patch(":ticketId/assign")
 assignTicket(
@@ -86,6 +103,7 @@ assignTicket(
 }
 
 ////rota para atribuir ticket 
+@ApiBearerAuth()
 @UseGuards(JwtAuthGuard)
 @Patch(':ticketId/assign-user')
 assignmentTicket(
@@ -101,7 +119,11 @@ assignmentTicket(
 }
 
 
-//rota para fecahr o ticket 
+//rota para fecahr o ticket
+@ApiBearerAuth()
+@ApiOperation({
+  summary: 'Fechar ticket',
+}) 
 @UseGuards(JwtAuthGuard)
 @Patch(':ticketId/close')
 closeTicket(

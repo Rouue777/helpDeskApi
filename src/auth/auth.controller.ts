@@ -4,6 +4,11 @@ import { RegisterDto } from './register.dto';
 import { LoginDto } from './login.dto';
 import { JwtAuthGuard } from './guards/jwt.auth.guard';
 import { UpdateUserRoleDto } from './updateUser.dto';
+import {
+  ApiBearerAuth,
+  ApiOperation,
+  ApiTags,
+} from '@nestjs/swagger';
 
 @Controller('auth')
 export class AuthController {
@@ -15,6 +20,9 @@ export class AuthController {
 
 
 //rota para registro
+@ApiOperation({
+  summary: 'Cadastrar usuário',
+})
 @Post('register')
 register(@Body() registeDto : RegisterDto){
  return this.authService.register(registeDto)
@@ -22,12 +30,18 @@ register(@Body() registeDto : RegisterDto){
 }
 
 //rota para login
+@ApiOperation({
+  summary: 'Realiza login do usuário',
+})
 @Post('login')
 login(@Body() loginDto : LoginDto){
     return this.authService.login(loginDto)
 }
 
-//rota para login
+//rota para role
+@ApiOperation({
+  summary: 'Atualizar role do usuário',
+})
 @UseGuards(JwtAuthGuard)
 @Patch('role')
 updateRole(

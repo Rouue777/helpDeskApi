@@ -2,6 +2,11 @@ import { Body, Controller, Get, Param, Post, Request, UseGuards } from '@nestjs/
 import { CreateCommentDto } from './comment.dto';
 import { CommentService } from './comment.service';
 import { JwtAuthGuard } from 'src/auth/guards/jwt.auth.guard';
+import {
+  ApiBearerAuth,
+  ApiOperation,
+  ApiTags,
+} from '@nestjs/swagger';
 
 
 @Controller('comments')
@@ -13,6 +18,7 @@ export class CommentController {
     ){}
 
 //rota para criar comentario
+@ApiBearerAuth()
 @UseGuards(JwtAuthGuard)
 @Post(':ticketId/comment')
 create(@Param('ticketId') ticketId : string,
@@ -29,7 +35,7 @@ create(@Param('ticketId') ticketId : string,
 }
 
 // rota para pegar comentarios do ticket
-
+@ApiBearerAuth()
 @UseGuards(JwtAuthGuard)
 @Get(':ticketId')
 getCommentsByTicket(

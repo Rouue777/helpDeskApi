@@ -1,6 +1,11 @@
 import { Controller, Get, Param, UseGuards } from '@nestjs/common';
 import { LogService } from './log.service';
 import { JwtAuthGuard } from 'src/auth/guards/jwt.auth.guard';
+import {
+  ApiBearerAuth,
+  ApiOperation,
+  ApiTags,
+} from '@nestjs/swagger';
 
 @Controller('log')
 export class LogController {
@@ -12,6 +17,7 @@ export class LogController {
 
 
 //rota para logs de cada ticket
+@ApiBearerAuth()
 @UseGuards(JwtAuthGuard)
 @Get(':ticketId')
 getLogsByTicket(
