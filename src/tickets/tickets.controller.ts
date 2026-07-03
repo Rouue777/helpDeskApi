@@ -101,7 +101,18 @@ assignmentTicket(
 }
 
 
-
+//rota para fecahr o ticket 
+@UseGuards(JwtAuthGuard)
+@Patch(':ticketId/close')
+closeTicket(
+  @Param('ticketId') ticketId: string,
+  @Request() req,
+) {
+  return this.ticketService.closeTicket(
+    ticketId,
+    req.user,
+  );
+}
 
 
 }

@@ -64,6 +64,37 @@ async create(
 }
 
 
+
+
+//mostrar todos comentarios
+async getCommentsByTicket(ticketId: string) {
+  // Verifica se o ticket existe
+  const ticketExists = await this.prisma.ticket.findUnique({
+    where: {
+      id: ticketId,
+    },
+  });
+
+  if (!ticketExists) {
+    throw new NotFoundException('Ticket não encontrado');
+  }
+
+  const comments = await this.prisma.comment.findMany({
+    where: {
+      ticketId,
+    },
+    orderBy: {
+      createdAt: 'asc',
+    },
+  });
+
+  return {
+    message: 'Comentários encontrados',
+    comments,
+  };
+}
+
+
 };
 
 

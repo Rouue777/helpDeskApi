@@ -317,6 +317,58 @@ export class TicketsService {
 
 
 
+//fechar ticket 
+async closeTicket(
+  ticketId: string,
+  user: any,
+) {
+  // Verifica se o ticket existe
+  const ticketExists = await this.prisma.ticket.findUnique({
+    where: {
+      id: ticketId,
+    },
+  });
+
+  if (!ticketExists) {
+    throw new NotFoundException('Ticket não encontrado');
+  }
+
+  // Apenas SUPPORT e ADMIN podem fechar tickets
+  if (user.role === 'USER') {
+    throw new ForbiddenException(
+      'Você não possui permissão para fechar tickets',
+    );
+  }
+
+  // Verifica se o ticket já está fechado
+  if (ticketExists.status === 'CLOSED') {
+    throw new ConflictException(
+      'Este ticket já está fechado',
+    );
+  }
+
+  // Fecha o ticket
+  const closedTicket = await this.prisma.ticket.update({
+    where: {
+      id: ticketId,
+    },
+    data: {
+      status: 'CLOSED',
+    },
+  });
+
+  // Cria log
+  await this.logService.create(
+    'Ticket fechado',
+    user.sub,
+    ticketId,
+  );
+
+  return {
+    message: 'Ticket fechado com sucesso',
+    ticket: closedTicket,
+  };
+}
 
 
 }

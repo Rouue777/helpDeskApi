@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 
 @Injectable()
@@ -22,5 +22,34 @@ async create(
     },
   });
 }
+
+//exibindo logs do ticket
+async getLogsByTicket(ticketId: string) {
+  // Verifica se o ticket existe
+  const ticketExists = await this.prisma.ticket.findUnique({
+    where: {
+      id: ticketId,
+    },
+  });
+
+  if (!ticketExists) {
+    throw new NotFoundException('Ticket não encontrado');
+  }
+
+  const logs = await this.prisma.log.findMany({
+    where: {
+      ticketId,
+    },
+    orderBy: {
+      createdAt: 'asc',
+    },
+  });
+
+  return {
+    message: 'Logs encontrados',
+    logs,
+  };
+}
+
 
 }

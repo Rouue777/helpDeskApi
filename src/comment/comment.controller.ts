@@ -1,4 +1,4 @@
-import { Body, Controller, Param, Post, Request, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, Request, UseGuards } from '@nestjs/common';
 import { CreateCommentDto } from './comment.dto';
 import { CommentService } from './comment.service';
 import { JwtAuthGuard } from 'src/auth/guards/jwt.auth.guard';
@@ -26,6 +26,18 @@ create(@Param('ticketId') ticketId : string,
 
     )
 
+}
+
+// rota para pegar comentarios do ticket
+
+@UseGuards(JwtAuthGuard)
+@Get(':ticketId')
+getCommentsByTicket(
+  @Param('ticketId') ticketId: string,
+) {
+  return this.commentService.getCommentsByTicket(
+    ticketId,
+  );
 }
 
 
