@@ -307,11 +307,11 @@ GET /logs/:ticketId
 
 GitHub
 
-https://github.com/seu-usuario
+https://github.com/Rouue777
 
 LinkedIn
 
-https://linkedin.com/in/seu-linkedin
+https://www.linkedin.com/in/jefersonsantos36/
 
 ---
 
