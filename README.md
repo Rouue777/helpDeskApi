@@ -110,7 +110,7 @@ src
 ## Clonar o projeto
 
 ```bash
-git clone <URL_DO_REPOSITORIO>
+git clone https://github.com/Rouue777/helpDeskApi
 ```
 
 ```bash
