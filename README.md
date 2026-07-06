@@ -186,9 +186,17 @@ Instale as dependências
 
 ```bash
 npm install
-```
 
----
+
+```docker compose up --build
+
+Acesse:
+
+localhost:3000
+
+Swagger:
+
+localhost:3000/api
 
 # 🗄 Banco de dados
 
