@@ -5,7 +5,6 @@ import { UpdateTicketDto } from './updateTicket.dto';
 import { LogService } from 'src/log/log.service';
 import { UpdateTicketStatusDto } from './updateTicketStatus.dto';
 import { AssignTicketDto } from './assignmentTicket.dto';
-import { EnumPriorityFilter } from 'generated/prisma/commonInputTypes';
 import { Priority } from '@prisma/client';
 
 @Injectable()
