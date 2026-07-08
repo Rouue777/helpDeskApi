@@ -11,4 +11,4 @@ echo "Executando seed..."
 npx prisma db seed
 
 echo "Iniciando aplicação..."
-npm run start:dev
+npm run start:prod
